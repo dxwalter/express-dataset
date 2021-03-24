@@ -29,8 +29,9 @@ describe('git_test ', function() {
 						event.push(line);
 					}	
 				});
-				Promise.mapSeries(event, (e) => {
-					let eve = JSON.parse(e);
+
+				Promise.mapSeries (event, (event) => {
+					let eve = JSON.parse(event);
 					if(eve.request.method == "DELETE") {
 						return chai.request(server)
 							.delete(eve.request.url)
@@ -62,17 +63,15 @@ describe('git_test ', function() {
 					}
 					if(eve.request.method == "PUT") {
 						return chai.request(server)
-								   .put(eve.request.url)
-								   .set(eve.request.headers)
-								   .send(eve.request.body)
-								   .then((res) => {
-								   		return res;
-								   }).catch((err) => {
-								   		return err;
-								   });
+							.put(eve.request.url)
+							.set(eve.request.headers)
+							.send(eve.request.body)
+							.then((res) => {
+									return res;
+							}).catch((err) => {
+									return err;
+							});
 					}
-
-
 				}).then((results) => {
 					for (let j = 0; j < results.length; j++) {
 						let e = JSON.parse(event[j]);
@@ -83,27 +82,29 @@ describe('git_test ', function() {
 							if(e.response.status_code == 404) {
 								continue;
 							}
-		 					expect(ar2.length).to.equal(ar1.length);
+							expect(ar2.length).to.equal(ar1.length);
 							for (let k = 0; k < ar1.length; k++) {
 								expect(ar2[k]).to.deep.equal(ar1[k]);
 							}
 						}
 						if (e.request.method == "POST") {
-							expect(results[j].status).to.equal(e.response.status_code);
+							if (results[j] !== undefined) {
+								expect(results[j].status).to.equal(e.response.status_code);
+							}
 						}
 						if (e.request.method == "DELETE") {
-							expect(results[j].status).to.equal(e.response.status_code);
+							if (results[j].status !== undefined) {
+								expect(results[j].status).to.equal(e.response.status_code);
+							}
 						}
 						if (e.request.method == "PUT") {
-							expect(results[j].status).to.equal(e.response.status_code);
+							if (results[j].status !== undefined) {
+								expect(results[j].status).to.equal(e.response.status_code);
+							}
 						}
 					}
-					done();
-				}).catch((err) => {
-					console.log(err);
-					done(err);
-				});
-			});
+				}).catch(done);
+				}).timeout(10000);
 			id += 1;
 		}
 	})
