@@ -1,6 +1,5 @@
 const Datastore = require('nedb')
 const db = new Datastore({ filename: './dataStore/actors.db', autoload: true });
-db.persistence.compactDatafile()
 
 class ActorsModelFunction {
     constructor () {
